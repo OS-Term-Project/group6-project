@@ -6,36 +6,50 @@
 
 #define PAGE_SIZE 256
 #define NUM_FRAMES 256
+#define NUM_PAGES 256
+#define TLB_SIZE 16
 
+// TLB entry structure
+typedef struct {
+    int page_number;
+    int frame_number;
+} tlb_entry;
+
+// page table
+int page_table[NUM_PAGES];
+// physical memory
+char physical_memory[NUM_FRAMES][PAGE_SIZE];
 // TLB
-int tlb[16][2]; // Assuming a 16-entry TLB
+tlb_entry tlb[TLB_SIZE];
 
-// Page table
-int page_table[256];
+int next_available_frame = 0; // activatesthe next available frame
+
+// function to handle page fault
+void handle_page_fault(int page_number, FILE *backing_store) {
+    // read the page from the backing store and store it in the next available frame
+    fseek(backing_store, page_number * PAGE_SIZE, SEEK_SET);
+    fread(physical_memory[next_available_frame], sizeof(char), PAGE_SIZE, backing_store);
+    // update the page table with the new frame number
+    page_table[page_number] = next_available_frame;
+    // update the TLB
+    tlb[next_available_frame % TLB_SIZE].page_number = page_number;
+    tlb[next_available_frame % TLB_SIZE].frame_number = next_available_frame;
+    // increment the next available frame
+    next_available_frame++;
+}
 
 int main() {
-    // Create a backing store file
-    FILE *backing_store = fopen("BACKING_STORE.bin", "wb");
-    // Write the page data to the backing store
-    // For this specific task, writing the page data to the backing store is not required as the focus is on reading from the backing store.
+    // open the backing store file
+    FILE *backing_store = fopen("BACKING_STORE.bin", "rb");
+
+    // handle page fault for page 251
+    handle_page_fault(251, backing_store);
+
+    // access the memory located at frame 0 and offset 25 
+    printf("the value at physical address: %d\n", physical_memory[0][25]);
+
+    // close the backing store file
     fclose(backing_store);
-
-    // Load page 251 into Frame 0
-    backing_store = fopen("BACKING_STORE.bin", "rb");
-    fseek(backing_store, 251 * PAGE_SIZE, SEEK_SET);
-    char frame[PAGE_SIZE];
-    fread(frame, sizeof(char), PAGE_SIZE, backing_store);
-    fclose(backing_store);
-
-    // Update the TLB and page table
-    tlb[0][0] = 251; // Page number
-    tlb[0][1] = 0;   // Frame number
-    page_table[251] = 0; // Update the page table with the frame number
-
-    // Fill the frame from 0 to 255
-    for (int i = 0; i < PAGE_SIZE; i++) {
-        printf("%d ", frame[i]); // Output the contents of the frame
-    }
 
     return 0;
 }
