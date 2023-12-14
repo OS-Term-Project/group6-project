@@ -43,20 +43,20 @@ int main() {
     FILE *backing_store = fopen("BACKING_STORE.bin", "rb");
 
     if (backing_store == NULL) {
-        fprintf(stderr, "Error: Could not open the backing store file.\n");
-        return 1; // Return an error code
+        fprintf(stderr, "Error: Could not open .\n");
+        return 1; // 
     }
 
     // handle page fault for page 251
     handle_page_fault(251, backing_store);
 
     // access the memory located at frame 0 and offset 25 
-    printf("The value at physical address: %d\n", physical_memory[0][25]);
+    printf("The value at physical address %d\n", physical_memory[0][25]);
 
     // close the backing store file
     if (fclose(backing_store) != 0) {
-        fprintf(stderr, "Error: Could not close the backing store file.\n");
-        return 1; // Return an error code
+        fprintf(stderr, "Error: Could not close .\n");
+        return 1; // 
     }
 
     return 0;
