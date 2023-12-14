@@ -18,15 +18,14 @@
 
 */
 
-extern int* logical_addresses;
+// Completed by Lillie Hunter
 
 
 int* read_address(char* filename){
     FILE * file = NULL;
-    int* addresses = NULL;
+    int addresses[1000];
 
     file = fopen(filename, "r");
-    addresses = (int*)malloc(sizeof(int)*1000);
 
     for (int line = 0; line < 1000; line++){
       	fscanf(file, "%d", &(addresses[line]));
@@ -38,28 +37,27 @@ int* read_address(char* filename){
   	return addresses;
 
 }
-
 int * find_page(int* address){
     int pageNumber;
 
     // casts pointer to an integer
-    //uintptr_t add = (uintptr_t)address;
+    uintptr_t add = (uintptr_t)address;
 
-    //pageNumber = (logical_addresses >> 8) & 0x00FF;
-    // printf("%d\n",pageNumber);
-    // printf("\n");
+    pageNumber = (add >> 8) & 0x00FF;
+
+    return pageNumber;
     
 }
 
 int * find_offset(int* address){
 
-    //int offset;
+    int offset;
 
-    //uintptr_t add = (uintptr_t)address;
+    uintptr_t add = (uintptr_t)address;
 
-    //offset = (logical_addresses & 0x00FF;
-    // printf("%d\n",offset);
-    // printf("\n");
+    offset = (logical_addresses & 0x00FF);
+ 
+    return offset
 }
 
 
